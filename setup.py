@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name = 'platform_cli',
-    version = '1.0.10',
+    version = '1.0.11',
     packages = ['platform_cli'],
     install_requires = [
         'psutil >= 0.6.1',
