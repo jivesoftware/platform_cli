@@ -5,7 +5,7 @@ setup(
     packages = ['platform_cli'],
     install_requires = [
         'psutil >= 0.6.1',
-        'pystache >= 0.5.3.2',
+        'pystache >= 0.5.3',
         'clint >= 0.3.1',
     ]
 )
