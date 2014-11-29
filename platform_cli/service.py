@@ -54,6 +54,7 @@ class ServiceProfile(object):
                env_tmpl=None,
                cwd_key=None,
                prop_validation_functions=None,
+               pre_graceful_functions=None,
                pre_start_functions=None,
                runtime_template_key_functions=None,
                run_sigterm=True,
@@ -79,6 +80,8 @@ class ServiceProfile(object):
         start/stop commands to be run from.
       prop_validation_functions: List of functions which take the template dictionary
         as a single argument, and return a string if there is some issue.
+      pre_graceful_functions: List of functions which take the template dictionary
+        as a single argument, and perform some task prior to service graceful restart.
       pre_start_functions: List of functions which take the template dictionary
         as a single argument, and perform some task prior to service start.
       runtime_template_key_functions: Dictionary mapping a new template property
@@ -109,6 +112,8 @@ class ServiceProfile(object):
     self.cwd_key = cwd_key
     self.prop_validation_functions = (prop_validation_functions
                                       if prop_validation_functions is not None else [])
+    self.pre_graceful_functions = (pre_graceful_functions
+                                if pre_graceful_functions is not None else [])
     self.pre_start_functions = (pre_start_functions
                                 if pre_start_functions is not None else [])
     self.runtime_template_key_functions = (
@@ -343,6 +348,8 @@ class ServiceProfile(object):
         with protected_file_path.ProtectedFilePath(pidfile_name):
           print('Gracefully restarting {} with:\n{}'.format(
                 self.name, self.graceful_cmd))
+          for func in self.pre_graceful_functions:
+            func(self.values)
           with open(self.stdout, 'a') as stdout:
             # pylint: disable=unused-variable
             graceful_proc = psutil.Popen(args=self.graceful_cmd,
