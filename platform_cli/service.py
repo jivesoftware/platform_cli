@@ -242,6 +242,12 @@ class ServiceProfile(object):
           pid = int(pidfile.read().strip())
       except IOError:
         pid = None
+      except ValueError:
+        pid = None
+        for proc in psutil.process_iter():
+          if proc.name() == os.path.basename(process_name):
+            proc.kill()
+        os.remove(pidfile_name)
       if pid is not None:
         try:
           proc = psutil.Process(pid)
